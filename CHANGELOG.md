@@ -1,18 +1,158 @@
 # OpenCore Legacy Patcher changelog
 
+## 1.6.0
+- Set `AssociatedBundleIdentifiers` property in launch services as an array
+- Move to auto-generated pre/postinstall scripts for PKGs
+  - Streamlines PKG creation process, ensuring Install and AutoPKG scripts are always in sync
+- Add support for `gktool` in PKG postinstall scripts
+  - Removes Gatekeeper "verifying" prompt on first launch after PKG installation
+  - Note `gktool` is only available on macOS Sonoma and newer
+- Resolve unpatching crash edge case when host doesn't require patches.
+- Implement new Software Update Catalog Parser for macOS Installers
+- Implement new Copy on Write detection mechanism for all file copying operations
+  - Implemented using `getattrlist` and `VOL_CAP_INT_CLONE` flag
+  - Helps improve performance on APFS volumes
+- Increment Binaries:
+  - PatcherSupportPkg 1.6.3 - release
+
+## 1.5.0
+- Restructure project directories
+  - Python:
+    - Move logic into `opencore_legacy_patcher` directory
+    - Use relative imports for local libraries
+  - Documentation:
+    - Move images to `docs/images`
+  - Payloads:
+    - Remove redundant/unused files bundled in payloads.dmg
+- Resolve unpatching Nvidia Web Drivers failing to clean up `/Library/Extensions`
+- Implement preflight code signature checks for macOS installer creation
+  - Ensures validity of `createinstallmedia` binary before execution
+- Modularize AutoPkg's pre/postinstall scripts
+  - Adjusted to use functions for better readability
+  - Implements ZSH shebang
+  - Removes OS logging
+- Disable usage of `OpenLegacyBoot.efi`
+  - Resolves boot issues on certain CSM-based Macs
+- Implement new PKG-based installer
+  - `OpenCore-Patcher.pkg` is now the recommended method for installation
+  - `OpenCore-Patcher-Uninstaller.pkg` is now available for uninstallation
+    - Note this only removes the application, not any patches applied
+  - `OpenCore-Patcher-GUI.app.zip` is deprecated and will be removed in future versions
+- Implement new Privileged Helper Tool
+  - Removes need for password prompts when installing patches, creating installers, etc.
+  - Installed at `/Library/PrivilegedHelperTools/com.dortania.opencore-legacy-patcher.privileged-helper`
+  - No launch services required
+  - For running from source, recompile tool with debug configuration (`make debug`)
+- Resolve OpenCore-Patcher.app window not appearing as topmost window on launch
+- Reworked CI tooling:
+  - New build script with reworked parameters: `Build-Project.command`
+  - Remove reliance on WhiteBox's Packages for AutoPkg creation
+    - Now implements `pkgbuild` and `productbuild` for package creation through `macOs-Pkg-Builder` Python module
+- Implement additional sanity checks before performing root patches
+  - Checks for mismatched snapshots vs root volume macOS versions
+- Increment Binaries:
+  - OpenCorePkg 1.0.0 - release
+
+## 1.4.3
+- Update non-Metal Binaries for macOS Sonoma:
+  - Resolve TeraScale 2 screen recording kernel panic
+  - Resolve Dock location after changing screen resolution
+  - Resolve 14.4 loginwindow crashes
+- Patch SkipLogo on Macs that natively support Monterey or newer
+  - Resolves missing Apple logo on boot screen
+- Increment Binaries:
+  - OpenCorePkg 0.9.9 - release
+
+## 1.4.2
+- Resolve Auto-Join support for Modern Wireless on macOS 14.4
+  - Applicable for BCM94360, 4360, 4350, 4331 and 43224 chipsets
+- Resolve WiFi support for Legacy Wireless on macOS 12.7.4 and 13.6.5
+  - Applicable for BCM94328, BCM94322 and Atheros chipsets
+- Resolve USB 1.1 on macOS Ventura regression from OCLP 1.4.0
+- Increment Binaries:
+  - PatcherSupportPkg 1.4.8 - release
+
+## 1.4.1
+- Update updater implementation
+- Resolve Keyboard/Trackpad support for MacBookAir6,x running macOS 14.4 and newer
+  - Expands SPI Keyboard and Trackpad patch to include MacBookAir6,x
+- Publish Bluetooth NVRAM variables for BCM2046 and BCM2070 chipsets
+  - Reduces need for NVRAM reset to restore Bluetooth support in newer OSes (Thanks @ausdauersportler)
+
+## 1.4.0
+- Refactor subprocess invocations
+- Resolve RecoveryOS support (Regression resolved in OpenCorePkg)
+- Restore SPI Keyboard and Trackpad support for macOS 14.4 and newer
+  - Applicable for MacBook8,1, MacBookAir7,x and MacBookPro12,1-14,x
+- Restore support for T1 on macOS 14.4 and newer
+  - Applicable for MacBookPro13,2, MacBookPro13,3, MacBookPro14,2, MacBookPro14,3
+- Restore support for legacy Metal GPUs on macOS 14.4 and newer
+  - Applicable for:
+    - Intel Ivy Bridge through Skylake
+    - Nvidia Kepler
+    - AMD legacy GCN
+- Restore support for USB 1.1 on macOS 14.4 and newer
+  - Applicable for Penryn Macs, Xserve3,1 and MacPro4,1/5,1
+- Resolve support for legacy and modern WiFi on macOS 14.4 and newer
+  - Applicable for all WiFi-equipped Macs
+  - Note with 14.4: Auto-Join may not work until you forget and rejoin the network
+- Increment binaries:
+  - OpenCorePkg 0.9.7 - release
+
+## 1.3.0
+- Resolve mismatched `CFBundleExecutable` and binary name for kexts.
+  - Resolves ProperTree binary detection (Thanks @CorpNewt).
+  - Applicable extensions:
+    - corecrypto_T1.kext
+    - corecaptureElCap.kext
+    - IO80211ElCap.kext
+- Resolve 3802-GPU support for macOS 14.2 Beta 2 and newer.
+  - Applicable GPUs:
+    - Intel Ivy Bridge and Haswell iGPUs
+    - Nvidia Kepler dGPUs
+- Increment Binaries:
+  - PatcherSupportPkg 1.4.6 - release
+
+## 1.2.1
+- Resolve `TeraScale 2 Acceleration` checkbox in Settings not being saved
+  - Thanks @rtd1250
+- Resolve Auto Patcher failing to launch after updating macOS
+  - Regression from 1.2.0
+
 ## 1.2.0
 - Resolve application not existing if user dismisses an update instead of installing
+- Resolve lldb crashes on extracted binaries
+  - Remove MH_DYLIB_IN_CACHE flag from binaries extracted with DSCE
 - Add support for detecting T1 Security Chips in DFU mode
+- Resolve macOS 14.2 coreauthd crashes on T1 Macs
+- Resolve missing NFC firmware on T1 Macs
 - Update non-Metal Binaries for macOS Sonoma:
   - Resolve Photos app crash
-- Add new Launch Daemon for clean up on macOS updates
-  - Resolves KDKless Macs failing to boot after updating from 14.0 to 14.x
-  - `/Library/LaunchDaemons/com.dortania.opencore-legacy-patcher.macos-update.plist`
+  - Resolve loginwindow crashes
+  - Workaround tile window popup freezing apps by disabling the feature
+  - Workaround monochrome desktop widgets rendering issues by enforcing full color (can be disabled in OCLP settings)
+- Add new arguments:
+  - `--cache_os`: Cache necessary patcher files for OS to be installed (ex. KDKs)
+  - `--prepare_for_update`: Clean up patcher files for OS to be installed (ex. /Library/Extensions)
+- Add new Launch Daemons for handling macOS updates:
+  - `macos-update.plist`:
+    - Resolves KDKless Macs failing to boot after updating from 14.0 to 14.x
+    - Adds support for KDK caching for OS to be installed
+    - Invoked when update is staged
+    - `/Library/LaunchDaemons/com.dortania.opencore-legacy-patcher.macos-update.plist`
+  - `os-caching.plist`
+    - Resolves unsupported/old KDKs from being used post-update
+    - Invoked when update is downloading
+    - `/Library/LaunchDaemons/com.dortania.opencore-legacy-patcher.os-caching.plist`
+- Load UI icons from local path
+  - Resolves macOS downloader crash on slower machines
+- Resolve iMac18,2 internal 4K display support
 - Remove News Widget removal from Control Centre
   - News Widget no longer crashes on 3802-based GPUs
 - Resolve i210 NIC support for macOS Sonoma
 - Increment Binaries:
- - PatcherSupportPkg 1.4.3 - release
+  - PatcherSupportPkg 1.4.5 - release
+  - OpenCorePkg 0.9.6 - release
 
 ## 1.1.0
 - Resolve rendering issues on Intel Broadwell iGPUs

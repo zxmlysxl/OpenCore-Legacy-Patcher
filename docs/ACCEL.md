@@ -46,7 +46,7 @@ Metal is Apple's in-house graphics API that acts as a replacement for OpenGL/Ope
 
 By default with the non-Metal acceleration patches, many background blur menus may act distorted when moving a cursor over it. With 0.4.1 and newer, users can enable a new Beta Blur feature to try and resolve the issue:
 
-![](../images/OCLP-GUI-Settings-Beta-Blur.png)
+![](./images/OCLP-GUI-Settings-Beta-Blur.png)
 
 Do note that enabling beta blurs can be more demanding on slower hardware
 ## Downloading older non-Metal Apps
@@ -70,7 +70,7 @@ This issue is fully resolved for 13.2.1 and lower starting from 0.2.5.
 
 ::: details Workaround for 0.2.4, Ventura 13.3+
 
-Due to the usage of amfi_get_out_of_my_way=1, macOS will fail to prompt users for special permissions upon application start as well as omit the entires in System Preferences. To work around this, we recommend users install tccplus to manage permissions.
+Due to the usage of amfi_get_out_of_my_way=1, macOS will fail to prompt users for special permissions upon application start as well as omit the entries in System Preferences. To work around this, we recommend users install tccplus to manage permissions.
 
 [Download TCCPlus](https://github.com/jslegendre/tccplus)
 
@@ -190,7 +190,7 @@ A somewhat strange issue on Intel HD3000-based Macs, on 3rd party displays somet
 
 | Default Color Profile | Display/Display P3 Profile |
 | :---                  | :---                       |
-| ![](../images/HD3000-Default-Colors.png) | ![](../images/HD3000-Display-Colors.png) |
+| ![](./images/HD3000-Default-Colors.png) | ![](./images/HD3000-Display-Colors.png) |
 
 ## Cannot Pair Bluetooth Devices
 

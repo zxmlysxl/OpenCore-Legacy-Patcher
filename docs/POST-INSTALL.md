@@ -2,6 +2,7 @@
 
 * [Booting without USB drive](#booting-without-usb-drive)
 * [Booting seamlessly without Boot Picker](#booting-seamlessly-without-boot-picker)
+* [SIP settings](#sip-settings)
 * [Applying Post Install Volume Patches](#applying-post-install-volume-patches)
 
 ## Booting without USB drive
@@ -20,33 +21,50 @@ And voila! No more USB drive required.
 
 To do this, run the OpenCore Patcher and head to Patcher Settings, then uncheck "Show OpenCore Bootpicker" on the Build tab:
 
-![](../images/OCLP-GUI-Settings-ShowPicker.png)
+![](./images/OCLP-GUI-Settings-ShowPicker.png)
 
 Once you've toggled it off, build your OpenCore EFI once again and install to your desired drive. Now to show the OpenCore selector, you can simply hold down the "ESC" key while clicking on EFI boot, and then you can release the "ESC" key when you see the cursor arrow at the top left.
 
-## Enabling SIP
+## SIP settings
 
-For many users, SIP will be lowered by default on build. For Intel HD 4000 users, you may have noticed that SIP is partially disabled. This is to ensure full compatibility with macOS Monterey and allow seamless booting between it and older OSes. However for users who do not plan to boot Monterey, you can re-enable under Patcher Settings.
-
-Note: Machines running macOS Ventura or systems with non-Metal GPUs cannot enable SIP outright, due to having a patched root volume. Enabling it will brick the installation.
-
-Going forward with 0.6.6, SIP settings can be accessed from the Security tab shown in the images.
-
-| SIP Enabled | SIP Lowered (Root Patching) | SIP Disabled |
-| :--- | :--- | :--- |
-| ![](../images/OCLP-GUI-Settings-SIP-Enabled.png) | ![](../images/OCLP-GUI-Settings-SIP-Root-Patch.png) | ![](../images/OCLP-GUI-Settings-SIP-Disabled.png) |
+SIP, or System Integrity Protection, needs to be lowered on systems where root patching is required to patch data on disk. This will vary between OS versions and the model in question. OCLP by default will determine the proper SIP options for the OS version and Mac model, in most cases the user has no need to touch these settings. However, this part explains how the SIP settings work in OCLP, where lowered SIP is needed and where full SIP could be enabled.
 
 :::warning
 
-If you're unsure whether you should enable SIP, leave it as-is. Systems where you have already ran the Post Install Root Patching cannot enable SIP without potentially breaking the current install.
+If you're unsure whether you should change the SIP settings, leave them as-is. Systems where you have already ran the Post Install Root Patching cannot enable SIP without potentially breaking the current install.
 
 :::
 
+SIP settings can be accessed from the Security tab shown in the images. To change SIP settings, make the changes here, return in main menu and rebuild OpenCore using the first option.
+
+| SIP Enabled | SIP Lowered (Root Patching) | SIP Disabled |
+| :--- | :--- | :--- |
+| ![](./images/OCLP-GUI-Settings-SIP-Enabled.png) | ![](./images/OCLP-GUI-Settings-SIP-Root-Patch.png) | ![](./images/OCLP-GUI-Settings-SIP-Disabled.png) |
+
+
+In the cases where SIP can be enabled, manually enabling it is needed. Easiest way to check whether you can fully enable SIP is the "Post Install Root Patch" section, if that section tells your system doesn't need patches (or you don't install the patches e.g. in case you don't need WiFi on a Mac Pro with upgraded GPU running Monterey) then it is safe to assume full SIP can be enabled.
+
+**Ventura and newer**
+
+All unsupported systems require lowered SIP.
+
+**Monterey**
+
+Majority of unsupported systems from 2013 onward can enable full SIP.
+Pre-2012 systems, also known as "non-Metal" (includes Mac Pros without upgraded GPU), as well as NVIDIA Kepler and Intel HD 4000 GPUs require lowered SIP.
+
+Some systems such as Mac Pros also require root patching for stock WiFi cards but if you do not need WiFi or you plan to upgrade the card, there is no need for root patching and as such SIP can be fully enabled.
+
+**Big Sur**
+
+All Metal capable systems from 2012 onward (incl. NVIDIA Kepler and Intel HD 4000) as well as Mac Pros with upgraded GPU can run with full SIP enabled. 
+Non-Metal systems still require lowered SIP.
+
 ## Applying Post Install Volume Patches
 
-:::warning 
+:::warning
 
-If you need to use Migration Assistant to bring over data to your new macOS install, it is **highly recommended** to avoid restoring from inside Setup Assistant and waiting to install root patches until after the transfer is complete. If root patches were automatically installed, you can use the options available in the OCLP app to remove them. 
+If you need to use Migration Assistant to bring over data to your new macOS install, it is **highly recommended** to avoid restoring from inside Setup Assistant and waiting to install root patches until after the transfer is complete. If root patches were automatically installed, you can use the options available in the OCLP app to remove them.
 
 Using Migration Assistant while patches are installed can lead to an unbootable system, requiring a reinstall of macOS.
 
@@ -60,7 +78,7 @@ Users can also see whether applicable patches have been installed, date and vers
 
 | Automatic install prompt | Status |
 | :--- | :--- |
-| ![](../images/OCLP-GUI-root-patch-update.png) | ![](../images/OCLP-GUI-Root-Patch-Status.png)  |
+| ![](./images/OCLP-GUI-root-patch-update.png) | ![](./images/OCLP-GUI-Root-Patch-Status.png)  |
 
 
 
@@ -72,7 +90,7 @@ There is also an option to remove root patches, which may be required in some si
 
 | Listing Patches | Patching Finished |
 | :--- | :--- |
-| ![](../images/OCLP-GUI-Root-Patch.png) | ![](../images/OCLP-GUI-Root-Patch-Finished.png) |
+| ![](./images/OCLP-GUI-Root-Patch.png) | ![](./images/OCLP-GUI-Root-Patch-Finished.png) |
 
 :::warning
 

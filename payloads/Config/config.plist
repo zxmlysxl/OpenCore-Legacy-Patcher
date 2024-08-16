@@ -265,6 +265,30 @@
 				<key>Skip</key>
 				<integer>0</integer>
 			</dict>
+			<dict>
+				<key>Arch</key>
+				<string>x86_64</string>
+				<key>Comment</key>
+				<string>Patch SkipLogo</string>
+				<key>Count</key>
+				<integer>0</integer>
+				<key>Enabled</key>
+				<false/>
+				<key>Find</key>
+				<data>UwBrAGkAcABMAG8AZwBv</data>
+				<key>Identifier</key>
+				<string>Apple</string>
+				<key>Limit</key>
+				<integer>0</integer>
+				<key>Mask</key>
+				<data></data>
+				<key>Replace</key>
+				<data>QQBrAGkAcABMAG8AZwBv</data>
+				<key>ReplaceMask</key>
+				<data></data>
+				<key>Skip</key>
+				<integer>0</integer>
+			</dict>
 		</array>
 		<key>Quirks</key>
 		<dict>
@@ -283,6 +307,8 @@
 			<key>EnableSafeModeSlide</key>
 			<false/>
 			<key>EnableWriteUnprotector</key>
+			<false/>
+			<key>FixupAppleEfiImages</key>
 			<false/>
 			<key>ForceBooterSignature</key>
 			<true/>
@@ -1747,6 +1773,24 @@
 				<key>Arch</key>
 				<string>x86_64</string>
 				<key>Comment</key>
+				<string>AppleCredentialManager - T1</string>
+				<key>Enabled</key>
+				<false/>
+				<key>MaxKernel</key>
+				<string></string>
+				<key>MinKernel</key>
+				<string>23.4.0</string>
+				<key>BundlePath</key>
+				<string>AppleCredentialManager.kext</string>
+				<key>ExecutablePath</key>
+				<string>Contents/MacOS/AppleCredentialManager</string>
+				<key>PlistPath</key>
+				<string>Contents/Info.plist</string>
+			</dict>
+			<dict>
+				<key>Arch</key>
+				<string>x86_64</string>
+				<key>Comment</key>
 				<string>AppleKeyStore - T1</string>
 				<key>Enabled</key>
 				<false/>
@@ -1765,24 +1809,6 @@
 				<key>Arch</key>
 				<string>x86_64</string>
 				<key>Comment</key>
-				<string>AppleCredentialManager - T1</string>
-				<key>Enabled</key>
-				<false/>
-				<key>MaxKernel</key>
-				<string></string>
-				<key>MinKernel</key>
-				<string>23.0.0</string>
-				<key>BundlePath</key>
-				<string>AppleCredentialManager.kext</string>
-				<key>ExecutablePath</key>
-				<string>Contents/MacOS/AppleCredentialManager</string>
-				<key>PlistPath</key>
-				<string>Contents/Info.plist</string>
-			</dict>
-			<dict>
-				<key>Arch</key>
-				<string>x86_64</string>
-				<key>Comment</key>
 				<string>USB Ethernet - ECM</string>
 				<key>Enabled</key>
 				<false/>
@@ -1794,6 +1820,42 @@
 				<string>ECM-Override.kext</string>
 				<key>ExecutablePath</key>
 				<string></string>
+				<key>PlistPath</key>
+				<string>Contents/Info.plist</string>
+			</dict>
+			<dict>
+				<key>Arch</key>
+				<string>x86_64</string>
+				<key>Comment</key>
+				<string>AppleHSSPISupport - SPI Top Case Support</string>
+				<key>Enabled</key>
+				<false/>
+				<key>MaxKernel</key>
+				<string></string>
+				<key>MinKernel</key>
+				<string>23.4.0</string>
+				<key>BundlePath</key>
+				<string>AppleHSSPISupport.kext</string>
+				<key>ExecutablePath</key>
+				<string>Contents/MacOS/AppleHSSPISupport</string>
+				<key>PlistPath</key>
+				<string>Contents/Info.plist</string>
+			</dict>
+			<dict>
+				<key>Arch</key>
+				<string>x86_64</string>
+				<key>Comment</key>
+				<string>AppleHSSPIHIDDriver - SPI Top Case Support</string>
+				<key>Enabled</key>
+				<false/>
+				<key>MaxKernel</key>
+				<string></string>
+				<key>MinKernel</key>
+				<string>23.4.0</string>
+				<key>BundlePath</key>
+				<string>AppleHSSPIHIDDriver.kext</string>
+				<key>ExecutablePath</key>
+				<string>Contents/MacOS/AppleHSSPIHIDDriver</string>
 				<key>PlistPath</key>
 				<string>Contents/Info.plist</string>
 			</dict>
@@ -1844,7 +1906,7 @@
 				<key>MaxKernel</key>
 				<string></string>
 				<key>MinKernel</key>
-				<string>23.0.0</string>
+				<string>23.4.0</string>
 				<key>Strategy</key>
 				<string>Exclude</string>
 			</dict>
@@ -2378,8 +2440,8 @@
 			<true/>
 			<key>HideAuxiliary</key>
 			<true/>
-			<!-- <key>InstanceIdentifier</key>
-			<string></string> -->
+			<key>InstanceIdentifier</key>
+			<string></string>
 			<key>LauncherPath</key>
 			<string>Default</string>
 			<key>LauncherOption</key>
@@ -3084,8 +3146,8 @@
 			<integer>-1</integer>
 			<key>ResizeUsePciRbIo</key>
 			<false/>
-			<!-- <key>ShimRetainProtocol</key>
-			<false/> -->
+			<key>ShimRetainProtocol</key>
+			<false/>
 			<key>TscSyncTimeout</key>
 			<integer>0</integer>
 			<key>UnblockFsConnect</key>

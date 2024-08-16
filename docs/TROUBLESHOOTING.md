@@ -3,7 +3,8 @@
 Here are some common errors that users may experience while using this patcher:
 
 * [OpenCore Legacy Patcher not launching](#opencore-legacy-patcher-not-launching)
-* [Stuck on `This version of Mac OS X is not supported on this platform` or (🚫) Prohibited Symbol](#stuck-on-this-version-of-mac-os-x-is-not-supported-on-this-platform-or-(🚫)-prohibited-symbol)
+* ["You don't have permission to save..." error when creating USB installer](#you-don-t-have-permission-to-save-error-when-creating-usb-installer)
+* [Stuck on `This version of Mac OS X is not supported on this platform` or (🚫) Prohibited Symbol](#stuck-on-this-version-of-mac-os-x-is-not-supported-on-this-platform-or-🚫-prohibited-symbol)
 * [Cannot boot macOS without the USB](#cannot-boot-macos-without-the-usb)
 * [Infinite Recovery OS Booting](#infinite-recovery-os-reboot)
 * [Stuck on boot after root patching](#stuck-on-boot-after-root-patching)
@@ -30,6 +31,29 @@ If the application won't launch (e.g. icon will bounce in the Dock), try launchi
 /Applications/OpenCore-Patcher.app/Contents/MacOS/OpenCore-Patcher
 ```
 
+## "You don't have permission to save..." error when creating USB installer
+
+In some cases, a following error saying "The bless of the installer disk failed" stating the reason as "You don't have permission to save..." may appear. 
+
+
+<div align="center">
+             <img src="./images/Error-No-Permission-To-Save.png" alt="NoPermissionToSave" width="400" />
+</div>
+
+
+To resolve this, you may try adding Full Disk Access permission for OpenCore Legacy Patcher. To add it, first go to the settings
+
+* Ventura and Sonoma: Go to System Settings -> Privacy and Security -> Full Disk Access
+
+* Big Sur and Monterey: Go to System Preferences -> Security and Privacy -> Full Disk Access
+
+Enable OpenCore-Patcher in the list. If not found on the list, press the + sign to add a new entity and find OpenCore Legacy Patcher from Applications.
+
+Restart OpenCore Legacy Patcher and try creating your USB drive again.
+
+Optional: After you've created your USB drive, you can remove OpenCore Legacy Patcher from Full Disk Access again.
+
+
 ## Stuck on `This version of Mac OS X is not supported on this platform` or (🚫) Prohibited Symbol
 
 This means macOS has detected an SMBIOS it does not support. To resolve this, ensure you're booting OpenCore **before** the macOS installer in the boot picker. Reminder that the option will be called `EFI Boot`.
@@ -40,7 +64,7 @@ However, if the 🚫 Symbol only appears after the boot process has already star
 
 ## Cannot boot macOS without the USB
 
-By default, the OpenCore Patcher won't install OpenCore onto the internal drive itself during installs. 
+By default, the OpenCore Patcher won't install OpenCore onto the internal drive itself during installs.
 
 After installing macOS, OpenCore Legacy Patcher should automatically prompt you to install OpenCore onto the internal drive. However, if it doesn't show the prompt, you'll need to either [manually transfer](https://dortania.github.io/OpenCore-Post-Install/universal/oc2hdd.html) OpenCore to the internal drive's EFI or Build and Install again and select your internal drive.
 
@@ -66,13 +90,17 @@ Then revert the snapshot
 ```sh
 bless --mount "/Volumes/Macintosh HD" --bootefi --last-sealed-snapshot
 ```
-After that, type the following
-```sh
-cd "/Volumes/Macintosh HD/Library/Extensions" && ls
-```
-You should now see bunch of .kexts. If you only see .kexts starting with "HighPoint" and "SoftRAID", you can ignore this and just restart the system. If other kexts are found, continue.
+Now we're going to clean the /Library/Extensions folder from offending kexts while keeping needed ones.
 
-Delete everything **except** for the ones that start with HighPoint and SoftRAID, by using `rm -rf "kextname"`
+Run the following and **make sure to type it carefully**
+
+::: warning
+If you have **FileVault 2 enabled**, you will need to mount the Data volume first. This can be done in Disk Utility by locating your macOS volume name, selecting its Data volume, and selecting the Mount option in the toolbar.
+:::
+
+```sh
+cd "/Volumes/Macintosh HD - Data/Library/Extensions" && ls | grep -v "HighPoint*\|SoftRAID*" | xargs rm -rf
+```
 
 Then restart and now your system should be restored to the unpatched snapshot and should be able to boot again.
 
@@ -112,7 +140,7 @@ To work-around this, we recommend that users manually connect using the "Other" 
 
 ## No Graphics Acceleration
 
-In macOS, GPU drivers are often dropped from the OS with each major release of it. With macOS Big Sur, currently, all non-Metal GPUs require additional patches to gain acceleration. In addition, macOS Monterey removed Graphics Drivers for both Intel Ivy Bridge and NVIDIA Kepler graphics processors. 
+In macOS, GPU drivers are often dropped from the OS with each major release of it. With macOS Big Sur, currently, all non-Metal GPUs require additional patches to gain acceleration. In addition, macOS Monterey removed Graphics Drivers for both Intel Ivy Bridge and NVIDIA Kepler graphics processors.
 
 If you're using OCLP v0.4.4, you should have been prompted to install Root Volume patches after the first boot from installation of macOS. If you need to do this manually, you can do so within the patcher app. Once rebooted, acceleration will be re-enabled as well as brightness control for laptops.
 
@@ -126,14 +154,14 @@ Due to Apple dropping NVIDIA Kepler support in macOS Monterey, [MacBookPro11,3's
 
 If you're having trouble with DisplayPort output on Mac Pros, try enabling Minimal Spoofing in Settings -> SMBIOS Settings and rebuild/install OpenCore. This will trick macOS drivers into thinking you have a newer MacPro7,1 and resolve the issue.
 
-![](../images/OCLP-GUI-SMBIOS-Minimal.png)
+![](./images/OCLP-GUI-SMBIOS-Minimal.png)
 
 ## Volume Hash Mismatch Error in macOS Monterey
 
 A semi-common popup some users face is the "Volume Hash Mismatch" error:
 
 <p align="center">
-<img src="../images/Hash-Mismatch.png">
+<img src="./images/Hash-Mismatch.png">
 </p>
 
 What this error signifies is that the OS detects that the boot volume's hash does not match what the OS is expecting, this error is generally cosmetic and can be ignored. However if your system starts to crash spontaneously shortly after, you'll want to reinstall macOS fresh without importing any data at first.
@@ -150,7 +178,7 @@ Head into the GUI, go to Patcher Settings, and toggle the bits you need disabled
 
 | SIP Enabled | SIP Lowered (Root Patching) | SIP Disabled |
 | :--- | :--- | :--- |
-| ![](../images/OCLP-GUI-Settings-SIP-Enabled.png) | ![](../images/OCLP-GUI-Settings-SIP-Root-Patch.png) | ![](../images/OCLP-GUI-Settings-SIP-Disabled.png) |
+| ![](./images/OCLP-GUI-Settings-SIP-Enabled.png) | ![](./images/OCLP-GUI-Settings-SIP-Root-Patch.png) | ![](./images/OCLP-GUI-Settings-SIP-Disabled.png) |
 
 ## Intermediate issues with USB 1.1 and Bluetooth on MacPro3,1 - MacPro5,1
 
@@ -199,4 +227,4 @@ Applicable models include:
 | Mac Pro     | Mid 2010 and older   | MacPro3,1 - MacPro5,1         |                                                  |
 
 
-![](../images/usb11-chart.png)
+![](./images/usb11-chart.png)

@@ -1,4 +1,4 @@
-![](../images/sonoma.png)
+![](./images/sonoma.png)
 
 *Well here we are again, it's always such a pleasure~*
 
@@ -71,12 +71,12 @@ While USB 1.1 may seem unimportant, it handles many important devices on your sy
 
 With OpenCore Legacy Patcher v0.6.0+, basic support has been implemented via Root Volume patching. However due to this, users will need to use a USB hub for installation and post-OS updates when patches are cleaned:
 
-![](../images/usb11-chart.png)
+![](./images/usb11-chart.png)
 
 ::: warning The following systems rely on USB 1.1
 
 * iMac10,x and older
-* Macmini3,1 and older
+* Macmini4,1 and older
 * MacBook7,1 and older
 * MacBookAir3,1 and older
 * MacPro5,1 and older
