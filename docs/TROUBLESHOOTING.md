@@ -1,4 +1,4 @@
-# Troubleshooting
+# General troubleshooting
 
 Here are some common errors that users may experience while using this patcher:
 
@@ -7,7 +7,9 @@ Here are some common errors that users may experience while using this patcher:
 * [Stuck on `This version of Mac OS X is not supported on this platform` or (🚫) Prohibited Symbol](#stuck-on-this-version-of-mac-os-x-is-not-supported-on-this-platform-or-🚫-prohibited-symbol)
 * [Cannot boot macOS without the USB](#cannot-boot-macos-without-the-usb)
 * [Infinite Recovery OS Booting](#infinite-recovery-os-reboot)
+* [System version mismatch error when root patching](#system-version-mismatch-error-when-root-patching)
 * [Stuck on boot after root patching](#stuck-on-boot-after-root-patching)
+* ["Unable to resolve dependencies, error code 71" when root patching](#unable-to-resolve-dependencies-error-code-71-when-root-patching)
 * [Reboot when entering Hibernation (`Sleep Wake Failure`)](#reboot-when-entering-hibernation-sleep-wake-failure)
 * [How to Boot Recovery through OpenCore Legacy Patcher](#how-to-boot-recovery-through-opencore-legacy-patcher)
 * [Stuck on "Your Mac needs a firmware update"](#stuck-on-your-mac-needs-a-firmware-update)
@@ -21,6 +23,7 @@ Here are some common errors that users may experience while using this patcher:
 * [Stuck on "Less than a minute remaining..."](#stuck-on-less-than-a-minute-remaining)
 * [No acceleration after a Metal GPU swap on Mac Pro](#no-acceleration-after-a-metal-gpu-swap-on-mac-pro)
 * [Keyboard, Mouse and Trackpad not working in installer or after update](#keyboard-mouse-and-trackpad-not-working-in-installer-or-after-update)
+* [No T1 functionality after installing Sonoma or newer](#no-t1-functionality-after-installing-sonoma-or-newer)
 
 
 ## OpenCore Legacy Patcher not launching
@@ -36,8 +39,8 @@ If the application won't launch (e.g. icon will bounce in the Dock), try launchi
 In some cases, a following error saying "The bless of the installer disk failed" stating the reason as "You don't have permission to save..." may appear. 
 
 
-<div align="center">
-             <img src="./images/Error-No-Permission-To-Save.png" alt="NoPermissionToSave" width="400" />
+<div align="left">
+             <img src="./images/Error-No-Permission-To-Save.png" alt="NoPermissionToSave" width="600" />
 </div>
 
 
@@ -76,6 +79,14 @@ With OpenCore Legacy Patcher, we rely on Apple Secure Boot to ensure OS updates 
 
 * Note: Machines with modified root volumes will also result in an infinite recovery loop until integrity is restored.
 
+## System version mismatch error when root patching
+
+Updates from now on modify the system volume already while downloading, which can lead to broken patches out of a sudden as well as a "version mismatch" error while root patching, since the operating system gets into a liminal state between two versions. The "version mismatch" error is a safeguard preventing OCLP from patching on a system that is in a weird liminal state, to avoid leading to a very likely boot failure.
+
+Currently there is a "PurgePendingUpdate" tool available [on the Discord server](https://discord.com/channels/417165963327176704/1037474131526029362/1255993208966742108) you can download and then run it in Terminal, to get rid of a pending update. This may be integrated into OCLP later on, however there is currently no ETA.
+
+Disabling automatic macOS updates is extremely recommended once recovered, to prevent it from happening again.
+
 ## Stuck on boot after root patching
 
 Boot into recovery by pressing space when your disk is selected on the OCLP bootpicker (if you have it hidden, hold ESC while starting up)
@@ -104,7 +115,30 @@ cd "/Volumes/Macintosh HD - Data/Library/Extensions" && ls | grep -v "HighPoint*
 
 Then restart and now your system should be restored to the unpatched snapshot and should be able to boot again.
 
+## "Unable to resolve dependencies, error code 71" when root patching
 
+If you're getting this error, it typically means you have some offending kernel extensions, to fix this you will have to clear them.
+
+Semi-automated way:
+
+1. Open Terminal
+2. Type `sudo zsh`
+3. Type `cd "/Volumes/Macintosh HD/Library/Extensions" && ls | grep -v "HighPoint*\|SoftRAID*" | xargs rm -rf`
+   * Make sure to rename "Macintosh HD" to what your drive name is
+4. Run OCLP root patcher again
+   
+Manual way:
+
+1. Navigate to /Library/Extensions
+2. Delete everything **except** HighPointIOP.kext, HighPointRR.kext and SoftRAID.kext
+3. Run OCLP root patcher again
+
+If there is no success, navigate to "/Library/Developer/KDKs" and delete everything.
+
+If still no success, type `sudo bless --mount "/Volumes/Macintosh HD/" --bootefi --last-sealed-snapshot` 
+* Make sure again to rename "Macintosh HD" to what your drive name is
+
+Run OCLP root patcher again.
 
 ## Reboot when entering Hibernation (`Sleep Wake Failure`)
 
@@ -154,13 +188,17 @@ Due to Apple dropping NVIDIA Kepler support in macOS Monterey, [MacBookPro11,3's
 
 If you're having trouble with DisplayPort output on Mac Pros, try enabling Minimal Spoofing in Settings -> SMBIOS Settings and rebuild/install OpenCore. This will trick macOS drivers into thinking you have a newer MacPro7,1 and resolve the issue.
 
-![](./images/OCLP-GUI-SMBIOS-Minimal.png)
+
+<div align="left">
+             <img src="./images/OCLP-GUI-SMBIOS-Minimal.png" alt="GUI SMBIOS minimal" width="800" />
+</div>        
+
 
 ## Volume Hash Mismatch Error in macOS Monterey
 
 A semi-common popup some users face is the "Volume Hash Mismatch" error:
 
-<p align="center">
+<p align="left">
 <img src="./images/Hash-Mismatch.png">
 </p>
 
@@ -209,6 +247,16 @@ The reason for this is that the autopatcher will assume that you will be using t
 
 For Macs using legacy USB 1.1 controllers, OpenCore Legacy Patcher can only restore support once it has performed root volume patches. Thus to install macOS, you need to hook up a USB hub between your Mac and Keyboard/Mouse.
 
+::: warning Note
+
+In macOS Sonoma, this seems to have been further weakened and some hubs may not be functional. 
+
+Alternative way is making sure to enable "Remote Login" in General -> Sharing before updating, which will enable SSH. That means you can take control using Terminal in another system by typing `ssh username@lan-ip-address` and your password. After that run Post Install Volume Patching by typing `/Applications/OpenCore-Patcher.app/Contents/MacOS/OpenCore-Patcher --patch_sys_vol` and finally `sudo reboot`.
+
+:::
+
+
+
 * For MacBook users, you'll need to find an external keyboard/mouse in addition to the USB hub
 
 More information can be found here:
@@ -226,5 +274,12 @@ Applicable models include:
 | Mac mini    | Mid 2011 and older   | Macmini3,1 - Macmini5,x       |                                                  |
 | Mac Pro     | Mid 2010 and older   | MacPro3,1 - MacPro5,1         |                                                  |
 
+<div align="left">
+             <img src="./images/usb11-chart.png" alt="USB1.1 chart" width="800" />
+</div>
 
-![](./images/usb11-chart.png)
+## No T1 functionality after installing Sonoma or newer
+
+If you notice your Touchbar etc not working, this means loss of T1 functionality. 
+
+Wiping the entire disk using Disk Utility with Sonoma or newer causes the T1 firmware to be removed, which due to removed support, the macOS Sonoma+ installer will not restore. To restore T1 functionality, Ventura or older has to be reinstalled. This can be done in another volume or external disk as well, as long as the OS is booted once. After this you can wipe the old OS or unplug the external disk.
