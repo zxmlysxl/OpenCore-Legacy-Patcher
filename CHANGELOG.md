@@ -1,5 +1,19 @@
 # OpenCore Legacy Patcher changelog
 
+## 2.2.0
+
+## 2.1.2
+- Add additional error handling for when building OpenCore errors out
+  - Prevents broken EFI from being installed to disk
+- Add additional error handling for broken settings file from OCLP 2.1.0
+  - If typing for settings is wrong, app will skip setting it, delete from settings file and use default
+  - Delete `/Users/Shared/.com.dortania.opencore-legacy-patcher.plist` and restart app to avoid this issue
+- Add additional warning about OCLP 2.1.0 bug where certain settings saved incorrectly
+  - Delete `/Users/Shared/.com.dortania.opencore-legacy-patcher.plist` and restart app if `TypeError: unsupported type: <class 'NoneType'>` error occurs
+
+## 2.1.1
+- Resolve boolean GUI settings saving incorrectly as Python's None type
+
 ## 2.1.0
 - Disable FeatureUnlock by default
   - Intended to maintain long term stability
@@ -11,6 +25,10 @@
   - When switching to a different model, model-specific GUI settings will be reset
   - Note resetting saved settings not implemented yet
     - Delete `/Users/Shared/.com.dortania.opencore-legacy-patcher.plist` and restart app to reset settings
+- Resolve macOS 15.1 (24B2083) Apple Silicon installer appearing as download option
+- Resolve WhatsApp crashing on 15.1
+- Increment binaries:
+  - PatcherSupportPkg 1.8.4 - release
 
 ## 2.0.2
 - Fix Nvidia Kepler patches not installing on Monterey

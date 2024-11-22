@@ -5,8 +5,10 @@ Here are some common errors that users may experience while using this patcher:
 * [OpenCore Legacy Patcher not launching](#opencore-legacy-patcher-not-launching)
 * ["You don't have permission to save..." error when creating USB installer](#you-don-t-have-permission-to-save-error-when-creating-usb-installer)
 * [Stuck on `This version of Mac OS X is not supported on this platform` or (🚫) Prohibited Symbol](#stuck-on-this-version-of-mac-os-x-is-not-supported-on-this-platform-or-🚫-prohibited-symbol)
+* [Stuck on hard disk selection with greyed out buttons in installer](#stuck-on-hard-disk-selection-with-greyed-out-buttons-in-installer)
 * [Cannot boot macOS without the USB](#cannot-boot-macos-without-the-usb)
 * [Infinite Recovery OS Booting](#infinite-recovery-os-reboot)
+* [Internal disk missing when building OpenCore](#internal-disk-missing-when-building-opencore)
 * [System version mismatch error when root patching](#system-version-mismatch-error-when-root-patching)
 * [Stuck on boot after root patching](#stuck-on-boot-after-root-patching)
 * ["Unable to resolve dependencies, error code 71" when root patching](#unable-to-resolve-dependencies-error-code-71-when-root-patching)
@@ -65,6 +67,12 @@ Once you've booted OpenCore at least once, your hardware should now auto-boot it
 
 However, if the 🚫 Symbol only appears after the boot process has already started (the bootscreen appears/verbose boot starts), it could mean that your USB drive has failed to pass macOS' integrity checks. To resolve this, create a new installer using a different USB drive (preferably of a different model.)
 
+## Stuck on hard disk selection with greyed out buttons in installer
+
+Switch installer language to English. If the language selector doesn't show up, [reset NVRAM](https://support.apple.com/en-mide/102603) and boot into the installer again.
+
+You can switch back to different language once macOS has installed.
+
 ## Cannot boot macOS without the USB
 
 By default, the OpenCore Patcher won't install OpenCore onto the internal drive itself during installs.
@@ -79,6 +87,25 @@ With OpenCore Legacy Patcher, we rely on Apple Secure Boot to ensure OS updates 
 
 * Note: Machines with modified root volumes will also result in an infinite recovery loop until integrity is restored.
 
+## Internal disk missing when building OpenCore
+
+If you're using a brand new disk that has not been used before or was never formatted in any macOS type, you may face the following error in OCLP when trying to build on the internal disk.
+
+<div align="left">
+             <img src="./images/OCLP_Failed_to_find_applicable_disks.png" alt="Failed to find applicable disks" width="600" />
+</div>
+
+There are two ways to to try and resolve this.
+
+1. Create a new FAT32 partition using Disk Utility, sized at around 100MB, naming does not matter. OpenCore will detect it and you will be able to build your EFI there.
+
+2. When installing macOS, choose "View -> Show all devices" in Disk Utility and format the entire disk by choosing the topmost option in the sidebar.
+
+<div align="left">
+             <img src="./images/wipe-disk.png" alt="Wipe disk" width="800" />
+</div>
+
+
 ## System version mismatch error when root patching
 
 Updates from now on modify the system volume already while downloading, which can lead to broken patches out of a sudden as well as a "version mismatch" error while root patching, since the operating system gets into a liminal state between two versions. The "version mismatch" error is a safeguard preventing OCLP from patching on a system that is in a weird liminal state, to avoid leading to a very likely boot failure.
@@ -86,6 +113,14 @@ Updates from now on modify the system volume already while downloading, which ca
 Currently there is a "PurgePendingUpdate" tool available [on the Discord server](https://discord.com/channels/417165963327176704/1037474131526029362/1255993208966742108) you can download and then run it in Terminal, to get rid of a pending update. This may be integrated into OCLP later on, however there is currently no ETA.
 
 Disabling automatic macOS updates is extremely recommended once recovered, to prevent it from happening again.
+
+**macOS Ventura and newer:**
+
+System Settings -> General -> Software Update -> (i) button next to Automatic Updates -> Disable "Download new updates when available".
+
+**macOS Big Sur and Monterey:**
+
+System Preferences -> Software Update -> Advanced -> Disable "Download new updates when available".
 
 ## Stuck on boot after root patching
 
@@ -237,7 +272,7 @@ Because this step can take a few hours or more depending on drive speeds, be pat
 
 ## No acceleration after a Metal GPU swap on Mac Pro
 
-If you finished installing Monterey with the original card installed (to see bootpicker for example) and swapped your GPU to a Metal supported one, you may notice that you're missing acceleration. To fix this, open OCLP and revert root patches to get your Metal-supported GPU work again.
+If you finished installing macOS with the original card installed (to see bootpicker for example) and swapped your GPU to a Metal supported one, you may notice that you're missing acceleration. To fix this, open OCLP and revert root patches to get your Metal-supported GPU work again. In macOS Ventura and newer, repatching is needed after reversion.
 
 Alternatively, you can remove "AutoPkg-Assets.pkg" from /Library/Packages on the USB drive before proceeding with the installation. To see the folder, enable hidden files with `Command` + `Shift` + `.`
 
